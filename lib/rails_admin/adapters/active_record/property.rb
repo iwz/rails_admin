@@ -18,7 +18,13 @@ module RailsAdmin
         end
 
         def type
-          if model.serialized_attributes[property.name.to_s]
+          serialized = if Rails.version < '4.2'
+                         model.serialized_attributes[property.name.to_s]
+                       else
+                         model.type_for_attribute(property.name).class == ::ActiveRecord::Type::Serialized
+                       end
+
+          if serialized
             :serialized
           else
             property.type
